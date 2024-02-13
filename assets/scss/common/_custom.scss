@@ -1,1 +1,34 @@
 // Put your custom SCSS code here
+@use "hugo:vars" as h;
+
+.home {
+  .content {
+    height: 50vh;
+
+    .profile-bg-img {
+      background: url(h.$profile-bg-img-url) no-repeat top right;
+      background-size: contain;
+      [data-bs-theme="dark"] & {
+        background: url(h.$profile-bg-img-url-dark) no-repeat top right;
+        background-size: contain;
+      }
+      width: 100%;
+      height: 50vh;
+      position: absolute;
+      z-index: -1000;
+      right: 0;
+
+      @media (max-width: 890px) {
+        background: none;
+      }
+    }
+
+    .greeting-section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: inherit;
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{{ $profile_bg_img_url := "" }}
+{{ with site.Params.style.profile_bg_img_url }}
+  {{ with resources.Get . }}
+    {{ with .Fill "1280x920 webp" }}
+      {{ $profile_bg_img_url = .RelPermalink }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $profile_bg_img_url_dark := "" }}
+{{ with site.Params.style.profile_bg_img_url_dark }}
+  {{ with resources.Get . }}
+    {{ with .Fill "1280x920 webp" }}
+      {{ $profile_bg_img_url_dark = .RelPermalink }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $vars := dict
+  "profile_bg_img_url"      (or $profile_bg_img_url (site.Params.style.profile_bg_img_url | relURL))
+  "profile_bg_img_url_dark" (or $profile_bg_img_url_dark (site.Params.style.profile_bg_img_url_dark | relURL))
+}}
+
+{{ return $vars }}
