@@ -3,6 +3,8 @@ title = "Nico"
 description = "Connect with me to chat about tech and software development!"
 images = ["cover.png"]
 
+footer = "Hola"
+
 # mainSections
 mainSections = ["docs"]
 
