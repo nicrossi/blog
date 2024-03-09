@@ -98,6 +98,24 @@
   }
 }
 
+.blog {
+  .content {
+    min-height: 85vh;
+  }
+}
+
+// Blog post images
+.img-post-list-container {
+  height:  15px;
+}
+
+.img-post-single-container {
+  height: 220px;
+  .img-post-single {
+    height: 185px;
+  }
+}
+
 .footer {
   svg {
     height: 20px;
