@@ -1,5 +1,8 @@
-/node_modules
-/resources
-/public
-.hugo_build.lock
-hugo_stats.json
+code/node_modules
+code/resources
+code/public
+code/.hugo_build.lock
+code/hugo_stats.json
+deploy/.terraform
+deploy/*.tfstate
+deploy/*.tfstate.backup
