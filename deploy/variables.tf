@@ -12,3 +12,11 @@ variable "aws_codebuild_project_name" {
 variable "codepipeline_full_repository_id" {
   default = ""
 }
+
+variable "hosted_zone_id" {
+  default = ""
+}
+
+variable "domain_name" {
+  default = ""
+}

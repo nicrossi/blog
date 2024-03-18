@@ -17,9 +17,6 @@ module "s3_bucket" {
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
 
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.oac_bucket_policy.json
-
   versioning = {
     enabled = true
   }
@@ -31,8 +28,8 @@ module "zones" {
   version = "~> 2.0"
 
   zones = {
-    (var.s3_bucket_name) = {
-      comment = "${var.s3_bucket_name} (${var.environment})"
+    (var.domain_name) = {
+      comment = "${var.domain_name} (${var.environment})"
       tags = {
         Environment = var.environment
       }
@@ -46,10 +43,11 @@ module "zones" {
 # Provision, Manage and Deploy SSL/TLS Certificates for the domain
 module "acm" {
   source             = "terraform-aws-modules/acm/aws"
-  version            = "~> 3.0"
+  version            = "~> 4.0"
 
-  domain_name = var.s3_bucket_name
-  zone_id     = module.zones.route53_zone_zone_id[var.s3_bucket_name]
+  domain_name = var.domain_name
+  zone_id     = module.zones.route53_zone_zone_id[var.domain_name]
+  subject_alternative_names = ["www.${var.domain_name}"]
 
   create_certificate = true
   validate_certificate = true
@@ -61,7 +59,7 @@ module "acm" {
 
   tags = {
     Environment = var.environment
-    Name = var.s3_bucket_name
+    Name = var.domain_name
     ManagedBy = "Terraform"
   }
 }
@@ -108,52 +106,51 @@ resource "aws_wafv2_web_acl" "wafv2" {
   tags = {
     ManagedBy = "Terraform"
   }
-
 }
 
 # Cloudfront distribution
 module "cloudfront" {
   source = "terraform-aws-modules/cloudfront/aws"
 
-  aliases             = [var.s3_bucket_name]
+  aliases = ["www.${var.domain_name}", var.domain_name]
 
-  comment = "Cloudfront distribution for ${var.s3_bucket_name}"
+  comment = "Cloudfront distribution for ${var.domain_name}"
   enabled = true
-
+  http_version        = "http2and3"
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
   retain_on_delete    = true
   wait_for_deployment = false
 
-  create_origin_access_identity = true
-
   web_acl_id = aws_wafv2_web_acl.wafv2.arn
 
-  origin_access_identities = {
-    s3_bucket_one = "Allows CloudFront to reach S3 bucket"
+  create_origin_access_control = true
+  origin_access_control = {
+    s3_oac = {
+      description      = "CloudFront access to S3 ${var.domain_name}"
+      origin_type      = "s3"
+      signing_behavior = "always"
+      signing_protocol = "sigv4"
+    }
   }
 
   origin = {
-    s3_one = {
-      origin_id        = "s3_one"
-      domain_name      = "${var.s3_bucket_name}.s3.amazonaws.com"
-      s3_origin_config = {
-        origin_access_identity = "s3_bucket_one"
-        http_port              = 80
-        https_port             = 443
-        origin_protocol_policy = "match-viewer"
-        origin_ssl_protocols   = ["TLSv1.2"]
-      }
+    s3_oac = {
+      domain_name           = module.s3_bucket.s3_bucket_bucket_regional_domain_name
+      origin_access_control = "s3_oac"
+      depends_on            = [module.s3_bucket]
     }
   }
 
   default_cache_behavior = {
     path_pattern           = "/*"
-    target_origin_id       = "s3_one"
+    target_origin_id       = "s3_oac"
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
     cached_methods  = ["GET", "HEAD"]
+    # Using Cache/ResponseHeaders/OriginRequest policies is not allowed
+    # together with `compress` and `query_string` settings
     compress        = true
     query_string    = true
   }
@@ -162,13 +159,13 @@ module "cloudfront" {
     acm_certificate_arn = module.acm.acm_certificate_arn
     ssl_support_method  = "sni-only"
   }
+
+  depends_on = [module.s3_bucket]
 }
 
 # Origin Access Control (OAC) bucket policy
 data "aws_iam_policy_document" "oac_bucket_policy" {
   statement {
-    sid       = "AllowCloudFrontServicePrincipalReadOnly"
-    effect    = "Allow"
     actions   = ["s3:GetObject"]
     resources = ["${module.s3_bucket.s3_bucket_arn}/*"]
 
@@ -183,6 +180,20 @@ data "aws_iam_policy_document" "oac_bucket_policy" {
       values   = [module.cloudfront.cloudfront_distribution_arn]
     }
   }
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = module.s3_bucket.s3_bucket_id
+  policy = data.aws_iam_policy_document.oac_bucket_policy.json
+}
+
+# Create an Origin Access Control (OAC) resource in our cloudfront module
+resource "aws_cloudfront_origin_access_control" "cloudfront_s3_oac" {
+  name                              = "CloudFront S3 ${var.s3_bucket_name} OAC"
+  description                       = "Cloud Front S3 ${var.s3_bucket_name} OAC"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 ## Create an alias record that routes DNS traffic to Cloudfront distribution
@@ -225,6 +236,47 @@ data "aws_iam_policy_document" "codebuild_assume_policy" {
   }
 }
 
+data "aws_iam_policy_document" "codebuild_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketVersioning",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+
+    resources = [
+      "${module.s3_bucket.s3_bucket_arn}",
+      "${module.s3_bucket.s3_bucket_arn}/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "codebuild:*"
+    ]
+
+    resources = [aws_codebuild_project.build_project.id]
+  }
+
+  statement {
+    sid = "CloudWatchLogsFullAccess"
+    effect = "Allow"
+    actions = [
+      "logs:*",
+      "cloudwatch:GenerateQuery"
+    ]
+
+    resources = ["*"]
+  }
+}
+
 # Create a GitHub connection
 resource "aws_codestarconnections_connection" "GitHub" {
   name          = "GitHub-connection"
@@ -258,7 +310,8 @@ resource "aws_codebuild_project" "build_project" {
   }
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/standard:5.0"
+    # standard 7.0 supports nodejs 20
+    image        = "aws/codebuild/standard:7.0"
     type         = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
   }
@@ -275,7 +328,6 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-
     location = module.s3_bucket.s3_bucket_id
     type     = "S3"
   }
@@ -379,6 +431,17 @@ data "aws_iam_policy_document" "codepipeline_policy" {
     resources = ["*"]
   }
 
+  statement {
+    sid = "CloudWatchLogsFullAccess"
+    effect = "Allow"
+
+    actions = [
+      "logs:*",
+      "cloudwatch:GenerateQuery"
+    ]
+
+    resources = ["*"]
+  }
 }
 
 # CodePipeline policy needed to use GitHub and CodeBuild
@@ -387,4 +450,12 @@ resource "aws_iam_role_policy" "attach_codepipeline_policy" {
   role = aws_iam_role.codepipeline_role.id
 
   policy = data.aws_iam_policy_document.codepipeline_policy.json
+}
+
+# Create CodeBuild policy
+resource "aws_iam_role_policy" "attach_codebuild_policy" {
+  name = "${var.s3_bucket_name}-codebuild-policy"
+  role = aws_iam_role.codebuild_assume_role.id
+
+  policy = data.aws_iam_policy_document.codebuild_policy.json
 }

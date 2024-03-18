@@ -1,5 +1,6 @@
 environment = "prod"
 region_primary = "us-east-1"
 s3_bucket_name = "nicorossi.net"
+domain_name = "nicorossi.net"
 aws_codebuild_project_name = "nicorossi-net"
 codepipeline_full_repository_id = "nicrossi/blog"
