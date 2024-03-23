@@ -1,7 +1,7 @@
 {
   "name": "blog",
-  "version": "0.0.0",
-  "description": "Doks theme",
+  "version": "1.0.0",
+  "description": "Nico Rossi's personal site",
   "author": "Hyas",
   "license": "MIT",
   "scripts": {

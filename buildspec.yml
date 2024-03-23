@@ -31,6 +31,8 @@ phases:
       - echo Source files from $CODEBUILD_SRC_DIR/code
       - echo Building the project based on commit $CODE_BUILD_SOURCE_VERSION
       - cd $CODEBUILD_SRC_DIR/code
+      - npm install shx
+      - npm run clean
       - npm install
       - npm run build
   post_build:
