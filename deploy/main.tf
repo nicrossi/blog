@@ -15,7 +15,7 @@ module "s3_bucket" {
 
   # S3 Bucket Ownership Controls
   control_object_ownership = true
-  object_ownership         = "BucketOwnerPreferred"
+  object_ownership         = "BucketOwnerEnforced"
 
   versioning = {
     enabled = true
