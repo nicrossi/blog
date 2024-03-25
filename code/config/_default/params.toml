@@ -2,8 +2,7 @@
 title = "Nico"
 description = "Connect with me to chat about tech and software development!"
 images = ["cover.png"]
-
-footer = "Hola"
+contactMe = "contact@nicorossi.net"
 
 # mainSections
 mainSections = ["docs"]
@@ -69,7 +68,7 @@ profile_bg_img_url_dark = '/images/profile-rounded-purple.png'
   backgroundDots = false # true (default) or false
 
   # Homepage
-  sectionFooter = false # false (default) or true
+  sectionFooter = true # false (default) or true
 
   # Blog
   relatedPosts = false # false (default) or true

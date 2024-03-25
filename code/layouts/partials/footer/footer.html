@@ -1,12 +1,8 @@
 <footer class="footer text-muted">
-  <div class="container-{{ site.Params.doks.containerBreakpoint | default "lg" }}">
+  <div class="container-{{ site.Params.doks.containerBreakpoint }}">
     <div class="row">
       <div class="col-lg-8 text-center text-lg-start">
-        <ul class="list-inline">
-          {{ range .Site.Menus.footer -}}
-            <li class="list-inline-item"><a class="text-muted" href="{{ .URL | relURL }}">{{ .Name }}</a></li>
-          {{- end }}
-        </ul>
+        <P>© {{ now.Format "2006" }} Nicolas Rossi. All rights reserved.</p>
       </div>
       <div class="col-lg-8 text-center text-lg-end">
         <ul class="list-inline">
