@@ -4,6 +4,7 @@ env:
   variables:
     HUGO_VERSION: "0.123.8"
     DART_SASS_VERSION: "1.70.0"
+    DOMAIN: "nicorossi.net"
 
 phases:
   install:
@@ -37,8 +38,10 @@ phases:
       - npm run build
   post_build:
     commands:
-      - echo Build completed on `date`
-
+      # Invalidate Cloudfront cache
+      - CLOUDFRONT_DISTRIBUTION_ID=$(aws cloudfront list-distributions --region us-east-1 --query "DistributionList.Items[?Aliases.Items[0]=='${DOMAIN}'].Id" --output text)
+      - INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths /* --query "Invalidation.Id" --output text)
+      - aws cloudfront wait invalidation-completed --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --id $INVALIDATION_ID
 artifacts:
   files:
     - '**/*'
