@@ -4,6 +4,8 @@ description = "Connect with me to chat about tech and software development!"
 images = ["cover.png"]
 contactMe = "contact@nicorossi.net"
 
+colorCardHeader = true
+
 # mainSections
 mainSections = ["docs"]
 

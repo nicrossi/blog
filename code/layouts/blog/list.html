@@ -23,9 +23,10 @@
     {{ $paginator := .Paginate (.Data.Pages) -}}
     {{ range $paginator.Pages -}}
       <div class="card">
+        {{- $featured := "" -}}
         {{ if site.Params.doks.imageList -}}
           {{- $images := .Resources.ByType "image" -}}
-          {{- $featured := $images.GetMatch "*feature*" -}}
+          {{- $featured = $images.GetMatch "*feature*" -}}
           {{- if not $featured }}{{ $featured = $images.GetMatch "{*cover*,*thumbnail*}" }}{{ end -}}
           {{- if $featured -}}
             {{ partial "img" (dict
@@ -34,6 +35,11 @@
             "alt" .Title
             "class" "rounded-top-1 img-post-list-container"
             )}}
+          {{ end -}}
+        {{ end -}}
+        {{- if not $featured }}
+          {{ if .Params.colorCardHeader -}}
+            <div class="color-card-header rounded-top-1 img-post-list-container"></div>
           {{ end -}}
         {{ end -}}
         <div class="card-body">
