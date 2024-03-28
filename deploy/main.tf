@@ -65,48 +65,48 @@ module "acm" {
 }
 
 # Create a WAFv2 Web ACL with a Rate-based rule
-resource "aws_wafv2_web_acl" "wafv2" {
-  name        = "CloudfrontRateBasedACL"
-  description = "Cloudfront rate based web ACL"
-  scope       = "CLOUDFRONT"
-
-  default_action {
-    allow {}
-  }
-  # Define the main rule for rate-based blocking
-  rule {
-    name     = "IPRateLimit"
-    priority = 1
-
-    action {
-      block {}
-    }
-
-    statement {
-      rate_based_statement {
-        limit              = 10000
-        aggregate_key_type = "IP"
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = false
-      metric_name                = "IPRateLimit"
-      sampled_requests_enabled   = false
-    }
-  }
-
-
-  visibility_config {
-    cloudwatch_metrics_enabled = false
-    metric_name                = "CloudfrontRateBasedACL"
-    sampled_requests_enabled   = false
-  }
-
-  tags = {
-    ManagedBy = "Terraform"
-  }
-}
+#resource "aws_wafv2_web_acl" "wafv2" {
+#  name        = "CloudfrontRateBasedACL"
+#  description = "Cloudfront rate based web ACL"
+#  scope       = "CLOUDFRONT"
+#
+#  default_action {
+#    allow {}
+#  }
+#  # Define the main rule for rate-based blocking
+#  rule {
+#    name     = "IPRateLimit"
+#    priority = 1
+#
+#    action {
+#      block {}
+#    }
+#
+#    statement {
+#      rate_based_statement {
+#        limit              = 10000
+#        aggregate_key_type = "IP"
+#      }
+#    }
+#
+#    visibility_config {
+#      cloudwatch_metrics_enabled = false
+#      metric_name                = "IPRateLimit"
+#      sampled_requests_enabled   = false
+#    }
+#  }
+#
+#
+#  visibility_config {
+#    cloudwatch_metrics_enabled = false
+#    metric_name                = "CloudfrontRateBasedACL"
+#    sampled_requests_enabled   = false
+#  }
+#
+#  tags = {
+#    ManagedBy = "Terraform"
+#  }
+#}
 
 # Cloudfront distribution
 module "cloudfront" {
@@ -121,8 +121,9 @@ module "cloudfront" {
   price_class         = "PriceClass_All"
   retain_on_delete    = true
   wait_for_deployment = false
+  default_root_object = "index.html"
 
-  web_acl_id = aws_wafv2_web_acl.wafv2.arn
+  #web_acl_id = aws_wafv2_web_acl.wafv2.arn
 
   create_origin_access_control = true
   origin_access_control = {
@@ -153,14 +154,30 @@ module "cloudfront" {
     # together with `compress` and `query_string` settings
     compress        = true
     query_string    = true
+
+    function_association = {
+      viewer-request = {
+        function_arn = aws_cloudfront_function.index_url_appender.arn
+      }
+    }
   }
 
   viewer_certificate = {
     acm_certificate_arn = module.acm.acm_certificate_arn
     ssl_support_method  = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   depends_on = [module.s3_bucket]
+}
+
+# Cloudfront function IndexUrlAppender
+resource "aws_cloudfront_function" "index_url_appender" {
+  name        = "IndexUrlAppender"
+  comment     = "Add index.html to request URLs that don’t include a file name"
+  runtime     = "cloudfront-js-2.0"
+  publish     = true
+  code = file("${path.module}/functions/IndexUrlAppender.js")
 }
 
 # Origin Access Control (OAC) bucket policy
