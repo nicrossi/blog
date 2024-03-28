@@ -49,7 +49,7 @@ module "acm" {
   zone_id     = module.zones.route53_zone_zone_id[var.domain_name]
   subject_alternative_names = ["www.${var.domain_name}"]
 
-  create_certificate = true
+  create_certificate   = true
   validate_certificate = true
   wait_for_validation  = true
   validation_method    = "DNS"
@@ -288,6 +288,17 @@ data "aws_iam_policy_document" "codebuild_policy" {
     actions = [
       "logs:*",
       "cloudwatch:GenerateQuery"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "cloudfront:ListDistributions",
+      "cloudfront:CreateInvalidation",
+      "cloudfront:GetInvalidation"
     ]
 
     resources = ["*"]
