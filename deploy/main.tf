@@ -18,7 +18,7 @@ module "s3_bucket" {
   object_ownership         = "BucketOwnerEnforced"
 
   versioning = {
-    enabled = true
+    enabled = false
   }
 }
 
