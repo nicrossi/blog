@@ -18,9 +18,14 @@
 }
 
 .home {
-  //background: linear-gradient(180deg, #1B1B35 84%, #422157 100%);
-  //background: linear-gradient(180deg, #ffffff 84%, #291f2f 100%);
-
+  // Preload profile images
+  body::after {
+    content: "";
+    background:
+      url($profile-bg-img-url) no-repeat -9999px -9999px,
+      url($profile-bg-img-url-dark) no-repeat -9999px -9999px;
+    display: none;
+  }
 
   .content {
     height: 50vh;

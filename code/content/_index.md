@@ -1,14 +1,14 @@
 ---
-title : ":wave: Hey there!"
-description: ""
+title : "👋Nico Rossi"
+description: "Software Engineer"
 lead: "Connect with me to chat about tech and software development!"
 date: 2023-09-07T16:33:54+02:00
 lastmod: 2023-09-07T16:33:54+02:00
 draft: false
 seo:
  title: "Nico Rossi"
- description: "nicorossi.net - Nico Rossi's personal website"
- canonical: ""
+ description: "Software Engineer"
+ canonical: "https://nicorossi.net/"
  noindex: false
 ---
 Adept at working in large, agile teams, I am passionate about harnessing technology to solve complex problems.

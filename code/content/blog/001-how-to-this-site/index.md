@@ -1,7 +1,7 @@
 ---
 title: "How I build this site"
-description: "Leveraging Hugo, Terraform, and AWS to build your site. Effortlessly streamline your build and deployment process with AWS CodePipeline for easy maintenance."
-summary: ""
+description: "Leveraging Hugo, Terraform, and AWS to build my site. Effortlessly streamline the build and deployment process with AWS CodePipeline for easy maintenance."
+summary: "Leveraging Hugo, Terraform, and AWS to build my personal site"
 date: 2024-03-26T23:24:22-03:00
 lastmod: 2024-03-26T23:24:22-03:00
 draft: false
@@ -14,7 +14,7 @@ homepage: false
 colorCardHeader: true
 seo:
   title: "How I build my personal site using Hugo, Terraform and AWS"
-  description: "Leveraging Hugo, Terraform, and AWS to build your site. Effortlessly streamline your build and deployment process with AWS CodePipeline for easy maintenance." # custom description (recommended)
+  description: "Leveraging Hugo, Terraform, and AWS to build my personal site. Effortlessly streamline the build and deployment process with AWS CodePipeline for easy maintenance."
   canonical: "https://nicorossi.net/blog/how-i-build-this-site/"
   noindex: false
 ---
