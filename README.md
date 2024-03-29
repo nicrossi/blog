@@ -9,8 +9,15 @@ To avoid manual tinkering with the AWS console for site modifications, all essen
 Under the `code` directory you'll find the source code for the site itself and follows the standard Hugo project structure.  
 - The site is built using the [Doks](https://getdoks.org/) theme.
 ## Deployment
-Under the `deploy` directory you'll find the Terraform code to manage the AWS resources needed to host the site.
-The deployment process is automated using AWS CodePipeline and CodeBuild. The pipeline is triggered by changes to the `main` branch of this repository. The pipeline is defined in the `deploy` directory and is managed using Terraform.
+Under the `deploy` directory you'll find the Terraform code to manage the AWS resources needed to host the site.\
+Infrastructure creation is not yet inscluded in the pipeline, so you'll need to run `terraform apply` manually to create the resources.
+```bash
+terraform init
+terraform plan -var-file=./vars/prod.tfvars
+terraform apply -var-file=./vars/prod.tfvars
+```
+Deployment process for the site is automated using AWS CodePipeline and CodeBuild. The pipeline is triggered by changes to the `main` branch of this repository. 
+Check out the [buildspec](./buildspec.yml) file for more details.
 
 Instead of the typical static website hosting setup on S3, I've opted for a CloudFront distribution with an S3 bucket as the origin. It's configured with Origin Access Control (OAC) to restrict access, eliminating the necessity to make the bucket public.  
 ### Pipeline and Automation
