@@ -1,6 +1,6 @@
 ---
 title: "How I build this site"
-description: "Just a how-to-this-site post."
+description: "Leveraging Hugo, Terraform, and AWS to build your site. Effortlessly streamline your build and deployment process with AWS CodePipeline for easy maintenance."
 summary: ""
 date: 2024-03-26T23:24:22-03:00
 lastmod: 2024-03-26T23:24:22-03:00
@@ -13,10 +13,10 @@ pinned: false
 homepage: false
 colorCardHeader: true
 seo:
-  title: "" # custom title (optional)
-  description: "" # custom description (recommended)
-  canonical: "" # custom canonical URL (optional)
-  noindex: false # false (default) or true
+  title: "How I build my personal site using Hugo, Terraform and AWS"
+  description: "Leveraging Hugo, Terraform, and AWS to build your site. Effortlessly streamline your build and deployment process with AWS CodePipeline for easy maintenance." # custom description (recommended)
+  canonical: "https://nicorossi.net/blog/how-i-build-this-site/"
+  noindex: false
 ---
 I've never blogged about anything before, so this is a totally new skill for me to master.
 But like many other proud nerds, I usually find myself jumping from blog to blog, reading about various topics.<br>
