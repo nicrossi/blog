@@ -70,7 +70,7 @@ profile_bg_img_url_dark = '/images/profile-rounded-purple.png'
   backgroundDots = false # true (default) or false
 
   # Homepage
-  sectionFooter = false
+  sectionFooter = true
 
   # Blog
   relatedPosts = false # false (default) or true
