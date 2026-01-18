@@ -1,0 +1,54 @@
+{{ define "main" }}
+<div class="row justify-content-center">
+  <div class="col-md-12 col-lg-11">
+    {{ if .Params.avatar -}}
+      {{ $image := .Resources.GetMatch (printf "**%s" .Params.avatar) -}}
+      {{ $imageLq := $image.Resize "15x15 webp q95" -}}
+      {{ $image = $image.Resize "300x300 webp q95" -}}
+      <div class="contributor-image">
+        <img class="img-fluid lazyload blur-up rounded-circle" src="{{ $imageLq.RelPermalink }}" data-src="{{ $image.RelPermalink }}" alt="{{ .Title }}" width="150" height="150">
+      </div>
+    {{ end -}}
+    {{ with .Params.headline -}}
+      <h1 class="text-center">{{ . }}</h1>
+    {{ else -}}
+      <h1 class="text-center">{{ .Title }}</h1>
+    {{ end -}}
+    {{ with .Params.summary -}}<p class="lead text-center">{{ . }}</p>{{ end -}}
+    {{ with .Content -}}<div class="text-center">{{ . }}</div>{{ end -}}
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-10">
+    <div class="projects-list">
+      {{ $paginator := .Paginate (.Data.Pages) -}}
+      {{ range $paginator.Pages -}}
+        <div class="project-item">
+          <div class="project-item-main">
+            <h3 class="project-item-title">
+              <a href="{{ .RelPermalink }}">{{ .Params.title }}</a>
+            </h3>
+            <p class="project-item-description">{{ .Params.summary | safeHTML }}</p>
+            <div class="project-item-meta">
+              {{ with .Params.tags }}
+                <div class="project-tags">
+                  {{ range . }}
+                    <span class="btn btn-light btn-sm">{{ . }}</span>
+                  {{ end }}
+                </div>
+              {{ end }}
+              <span class="project-updated">Updated {{ .Date.Format "Jan 2, 2006" }}</span>
+            </div>
+          </div>
+        </div>
+      {{ end -}}
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-md-12 col-lg-11">
+    {{ template "_internal/pagination.html" . }}
+  </div>
+</div>
+{{ end }}
+
