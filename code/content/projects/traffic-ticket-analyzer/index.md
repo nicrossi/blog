@@ -1,7 +1,7 @@
 ---
 title: "Distributed Traffic Ticket Analyzer"
 description: "A distributed MapReduce system built on Hazelcast that processes millions of parking tickets"
-summary: ""
+summary: "A distributed MapReduce system built on Hazelcast that processes millions of parking tickets"
 date: 2025-01-18T00:00:00-03:00
 lastmod: 2025-01-18T00:00:00-03:00
 draft: false

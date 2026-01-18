@@ -1,7 +1,7 @@
 ---
 title: "Compiler-Based JavaScript Minifier"
 description: "A Javascript minifier written in C, using a Flex-Bison Compiler."
-summary: ""
+summary: "A Javascript minifier written in C, using a Flex-Bison Compiler"
 date: 2025-06-23T23:10:00-03:00
 lastmod: 2025-06-23T23:10:00-03:00
 draft: false
