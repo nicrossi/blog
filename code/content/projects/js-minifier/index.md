@@ -12,6 +12,7 @@ contributors: []
 pinned: false
 homepage: false
 colorCardHeader: true
+github_url: "https://github.com/nicrossi/js-minifier"
 seo:
   title: "Compiler-Based JavaScript Minifier in C using Flex and Bison"
   description: "A Javascript minifier written in C, using a Flex-Bison Compiler."
